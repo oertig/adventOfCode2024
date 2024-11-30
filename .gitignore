@@ -1,0 +1,4 @@
+/tasks/*
+!/tasks/.gitkeep
+/inputs/*
+!/inputs/.gitkeep

@@ -15,44 +15,38 @@ foreach($lines as $line) {
     ];
 }
 
-function isSolveableEquation($wantedResult, &$operands) {
-    if(count($operands) == 2) {
-        return (
-            $operands[0] + $operands[1] == $wantedResult ||
-            $operands[0] * $operands[1] == $wantedResult
-        );
+function isSolveableEquation(&$wantedResult, &$operands) {
+    $operators = ['+', '*'];
+    $permutations = [];
+    $queue = [strval($operands[0])];
+
+    for ($i = 1; $i < count($operands); $i++) {
+        $tempQueue = [];
+
+        while(!empty($queue)) {
+            $currentPermutation = array_shift($queue);
+
+            foreach($operators as $operator) {
+                $newQueue = '(' . $currentPermutation . ' ' . $operator . ' ' . strval($operands[$i]) . ')';
+                $tempQueue[] = $newQueue;
+            }
+        }
+
+        $queue = $tempQueue;
     }
 
-    $lastElement = array_pop($operands);
-
-    return (
-        isSolveableEquation( ($wantedResult - $lastElement), $operands ) ||
-        (
-            $wantedResult % $lastElement == 0 &&
-            isSolveableEquation( ($wantedResult / $lastElement), $operands )
-        )
-    );
+    foreach($queue as $permutation) {
+        if( eval("return $permutation;") == $wantedResult ) {
+            return true;
+        }
+    }
 
     return false;
 }
 
 foreach($equations as $equation) {
-    $minValue = 0;
-    $maxValue = 1;
-
-    foreach($equation['operands'] as $operand) {
-        $minValue += $operand;
-        $maxValue *= $operand;
-    }
-
-    if($equation['result'] < $minValue || $equation['result'] > $maxValue) {
-        // echo 'equation exceeds bounds: ' . implode(' ', $equation['operands']) . ' = ' . $equation['result'] . "<br />";
-        continue;
-    } else if(isSolveableEquation($equation['result'], $equation['operands'])) {
-        // echo 'equation is solveable: ' . implode(' ', $equation['operands']) . ' = ' . $equation['result'] . "<br />";
+    if(isSolveableEquation($equation['result'], $equation['operands'])) {
         $sumOfSolveableEquations += $equation['result'];
-    } else {
-        // echo 'equation is not solveable: ' . implode(' ', $equation['operands']) . ' = ' . $equation['result'] . "<br />";
     }
 }
 

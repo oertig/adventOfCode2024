@@ -17,22 +17,17 @@ foreach($lines as $line) {
 
 function isSolveableEquation(&$wantedResult, &$operands) {
     $operators = ['+', '*', '||'];
-    $queue = [[$operands[0]]];
+    $queue = new SplQueue();
+    $queue->enqueue([$operands[0]]);
 
     for ($i = 1; $i < count($operands); $i++) {
-        $tempQueue = [];
+        $tempQueue = new SplQueue();
 
-        while(!empty($queue)) {
-            $currentExpression = array_shift($queue);
+        while (!$queue->isEmpty()) {
+            $currentExpression = $queue->dequeue();
 
-            foreach($operators as $operator) {
-                $newExpression = [];
-                foreach($currentExpression as $element) {
-                    $newExpression[] = $element;
-                }
-                
-                $newExpression[] = $operator;
-                $newExpression[] = $operands[$i];
+            foreach ($operators as $operator) {
+                $newExpression = array_merge($currentExpression, [$operator, $operands[$i]]);
 
                 if ($i == count($operands) - 1) {
                     // If this is the last operand, evaluate the expression
@@ -41,7 +36,7 @@ function isSolveableEquation(&$wantedResult, &$operands) {
                     }
                 } else {
                     // Otherwise, add the new expression to the queue
-                    $tempQueue[] = $newExpression;
+                    $tempQueue->enqueue($newExpression);
                 }
             }
         }

@@ -38,6 +38,7 @@ for($i = $amountFilesOnDisk - 1; $i > 0; $i--) { // iterate over all files from 
             );
 
             unset($filesOnDisk[$i + 1]); // remove the file from the end of the disk ($i + 1 because a new element was just added)
+            $i++; // adjust the index to account for the new element (the now last element hasn't been checked yet)
             break; // don't need to look further once the file has been moved
         }
     }
